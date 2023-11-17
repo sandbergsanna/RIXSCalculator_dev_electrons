@@ -10,3 +10,4 @@ developement*/
 CMD.lnk
 
 *.ipynb_checkpoints
+.vscode/settings.json
