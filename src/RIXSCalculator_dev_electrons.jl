@@ -10,7 +10,7 @@
 
 
 # start of module
-module RIXSCalculator
+module RIXSCalculator_dev_electrons
 
 
     # GENERAL USINGS
