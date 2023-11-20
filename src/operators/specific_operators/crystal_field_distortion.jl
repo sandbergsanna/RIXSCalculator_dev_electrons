@@ -116,16 +116,23 @@ end
 
 # possibly recalculate the matrix representation
 function recalculate!(operator :: DistortionOperator{SPB}, recursive::Bool=true, basis_change::Bool=true) where {SPSSBS<:AbstractSPSSBasisState, SPB<:SPBasis{SPSSBS}}
-    # create new matrix
-    matrix_rep = zeros(Complex{Float64}, length(basis(operator)), length(basis(operator)))
+    # check if the size of matrix is still okay
+    if size(operator.matrix_rep,1) == length(basis(operator)) && size(operator.matrix_rep,2) == length(basis(operator))
+        # size is okay, multiply matrix by 0 to erase all elements
+        operator.matrix_rep .*= 0.0
+    else
+        # create new matrix
+        operator.matrix_rep = zeros(Complex{Float64}, length(basis(operator)), length(basis(operator)))
+    end
     # recalculate the matrix elements
     for alpha in 1:length(basis(operator))
     for beta in 1:length(basis(operator))
         # set the respective entry
-        matrix_rep[alpha, beta] = getMatrixElementLDotnSquared(basis(operator), basis(operator)[alpha], basis(operator)[beta], operator.n)
+        operator.matrix_rep[alpha, beta] = getMatrixElementLDotnSquared(basis(operator), basis(operator)[alpha], basis(operator)[beta], operator.n)
     end
     end
-    operator.matrix_rep=matrix_rep-(sum(eigvals(matrix_rep))/length(basis(operator)))*I
+    # balance operator by subtracting (sum(energies)/num_of_states)*identity_operator
+    operator.matrix_rep -= (sum(eigvals(operator.matrix_rep))/length(basis(operator)))*I
 end
 
 # set a parameter (returns (found parameter?, changed matrix?))
